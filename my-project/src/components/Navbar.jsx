@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { logoutUser } from "../redux/userSlice";
@@ -8,6 +8,7 @@ const Navbar = () => {
   const { currentUser } = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleLogout = () => {
     dispatch(logoutUser())
@@ -81,7 +82,12 @@ const Navbar = () => {
 
             {/* Mobile menu button */}
             <div className="md:hidden flex items-center">
-              <button className="inline-flex items-center justify-center p-2 rounded-md text-gray-800 hover:text-red-700 focus:outline-none">
+              <button
+                className="inline-flex items-center justify-center p-2 rounded-md text-gray-800 hover:text-red-700 focus:outline-none"
+                onClick={() => setIsOpen((prev) => !prev)}
+                aria-label="Toggle menu"
+                aria-expanded={isOpen}
+              >
                 <svg
                   className="h-6 w-6"
                   xmlns="http://www.w3.org/2000/svg"
@@ -103,7 +109,7 @@ const Navbar = () => {
       </div>
 
       {/* Mobile menu, show/hide based on menu state */}
-      <div className="hidden md:hidden">
+      <div className={`${isOpen ? "block" : "hidden"} md:hidden`}>
         <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
           <Link
             to="/"

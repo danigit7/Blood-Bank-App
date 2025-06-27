@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { registerUser } from "../redux/userSlice";
+import { registerUser, clearError } from "../redux/userSlice";
 import { Droplet, AlertCircle, Loader } from "lucide-react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { toast } from "react-toastify";
 
 const Register = () => {
   const [displayName, setDisplayName] = useState("");
@@ -16,6 +17,10 @@ const Register = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { isLoading, error } = useSelector((state) => state.user);
+
+  useEffect(() => {
+    dispatch(clearError());
+  }, [dispatch]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -38,9 +43,9 @@ const Register = () => {
 
     try {
       await dispatch(registerUser({ email, password, displayName })).unwrap();
-      navigate("/");
+      navigate("/login");
     } catch (err) {
-      console.error("Registration failed:", err);
+      toast.error(err || "Registration failed");
     }
   };
 
@@ -62,6 +67,7 @@ const Register = () => {
               <Link
                 to="/login"
                 className="font-medium text-red-700 hover:text-red-800"
+                onClick={() => dispatch(clearError())}
               >
                 sign in to your existing account
               </Link>
@@ -69,10 +75,10 @@ const Register = () => {
           </div>
 
           <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-            {(error || formError) && (
+            {formError && (
               <div className="p-3 bg-red-50 border border-red-200 rounded-md flex items-center">
                 <AlertCircle className="h-5 w-5 text-red-500 mr-2" />
-                <p className="text-sm text-red-700">{formError || error}</p>
+                <p className="text-sm text-red-700">{formError}</p>
               </div>
             )}
 
@@ -91,7 +97,10 @@ const Register = () => {
                   autoComplete="name"
                   required
                   value={displayName}
-                  onChange={(e) => setDisplayName(e.target.value)}
+                  onChange={(e) => {
+                    setDisplayName(e.target.value);
+                    dispatch(clearError());
+                  }}
                   className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500"
                 />
               </div>
@@ -110,7 +119,10 @@ const Register = () => {
                   autoComplete="email"
                   required
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    dispatch(clearError());
+                  }}
                   className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500"
                 />
               </div>
@@ -129,7 +141,10 @@ const Register = () => {
                   autoComplete="new-password"
                   required
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    dispatch(clearError());
+                  }}
                   className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500"
                 />
               </div>
@@ -148,7 +163,10 @@ const Register = () => {
                   autoComplete="new-password"
                   required
                   value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  onChange={(e) => {
+                    setConfirmPassword(e.target.value);
+                    dispatch(clearError());
+                  }}
                   className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500"
                 />
               </div>

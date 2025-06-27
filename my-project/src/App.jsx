@@ -9,6 +9,8 @@ import { useDispatch } from "react-redux";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./firebase/config";
 import { setUser, clearUser } from "./redux/userSlice";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import Home from "./pages/Home";
 import Login from "./pages/Login";
@@ -38,18 +40,21 @@ const App = () => {
   }, [dispatch]);
 
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/donate" element={<Donate />} />
-        <Route path="/donors" element={<Donors />} />
+    <>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/donate" element={<Donate />} />
+          <Route path="/donors" element={<Donors />} />
 
-        {/* Fallback route */}
-        <Route path="*" element={<Navigate to="/\" replace />} />
-      </Routes>
-    </Router>
+          {/* Fallback route */}
+          <Route path="*" element={<Navigate to="/\" replace />} />
+        </Routes>
+      </Router>
+      <ToastContainer position="top-center" autoClose={3000} hideProgressBar={false} newestOnTop closeOnClick pauseOnFocusLoss draggable pauseOnHover />
+    </>
   );
 };
 

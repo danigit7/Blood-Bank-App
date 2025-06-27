@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { Heart, Users, Search, Droplet, ArrowRight, Info } from "lucide-react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { db } from "../firebase/config";
+import { collection, getDocs } from "firebase/firestore";
 
 const Home = () => {
   const { currentUser } = useSelector((state) => state.user);
@@ -59,6 +61,34 @@ const Home = () => {
       </div>
     </div>
   );
+
+  // Stats state
+  const [stats, setStats] = useState({
+    donors: 0,
+    livesSaved: 0,
+    cities: 0,
+    loading: true,
+  });
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, "donors"));
+        const donorsList = querySnapshot.docs.map((doc) => doc.data());
+        const donorCount = donorsList.length;
+        const citySet = new Set(donorsList.map((d) => d.city && d.city.trim()).filter(Boolean));
+        setStats({
+          donors: donorCount,
+          livesSaved: donorCount * 3, // Each donor can save up to 3 lives
+          cities: citySet.size,
+          loading: false,
+        });
+      } catch (err) {
+        setStats((prev) => ({ ...prev, loading: false }));
+      }
+    };
+    fetchStats();
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -296,15 +326,21 @@ const Home = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
             <div>
-              <p className="text-4xl font-bold text-red-700">10,000+</p>
+              <p className="text-4xl font-bold text-red-700">
+                {stats.loading ? "..." : stats.donors.toLocaleString()}
+              </p>
               <p className="mt-2 text-lg text-gray-600">Registered Donors</p>
             </div>
             <div>
-              <p className="text-4xl font-bold text-red-700">5,000+</p>
+              <p className="text-4xl font-bold text-red-700">
+                {stats.loading ? "..." : stats.livesSaved.toLocaleString()}
+              </p>
               <p className="mt-2 text-lg text-gray-600">Lives Saved</p>
             </div>
             <div>
-              <p className="text-4xl font-bold text-red-700">100+</p>
+              <p className="text-4xl font-bold text-red-700">
+                {stats.loading ? "..." : stats.cities.toLocaleString()}
+              </p>
               <p className="mt-2 text-lg text-gray-600">Cities Covered</p>
             </div>
           </div>
